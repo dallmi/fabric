@@ -379,8 +379,9 @@ def add_data_to_sheet(ws, data, columns, uv_col_indices=None, collapse_groups=No
         # Simple header format for input sheets
         dimension_fill = PatternFill(start_color='4472C4', end_color='4472C4', fill_type='solid')
         header_font = Font(bold=True, color='FFFFFF', size=9)
-        for col_num in range(1, len(columns) + 1):
+        for col_num, column_name in enumerate(columns, 1):
             cell = ws.cell(row=1, column=col_num)
+            cell.value = column_name  # Set the column name!
             cell.fill = dimension_fill
             cell.font = header_font
             cell.alignment = Alignment(horizontal='center', vertical='center')

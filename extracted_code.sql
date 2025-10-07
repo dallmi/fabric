@@ -94,3 +94,177 @@ site_reg_ AS (
         w.websitename,
         f.employeeregion
 ),
+site_div_reg_ AS (
+    SELECT
+        f.employeebusinessdivision,f.employeeregion,w.websitename,
+        COUNT(DISTINCT f.viewingcontactid) AS uniquevisitor
+    FROM
+        final AS f
+    left join site_page_inventory AS w ON f.marketingPageId = w.marketingPageId
+    GROUP BY
+        w.websitename,
+        f.employeeregion,
+        f.employeebusinessdivision
+),
+
+------------------
+
+--div_req_ty: Similar to div_reg, but only for the current year.
+div_req_ty AS (
+    SELECT
+        f.marketingPageId,
+        w.websitename,
+        f.employeebusinessdivision,
+        f.employeeregion,
+        COUNT(DISTINCT f.viewingcontactid) AS uniquevisitor,
+        COUNT(DISTINCT marketingPageIdliked) AS likes,
+        SUM(views) AS views,
+        SUM(visits) AS visits,
+        SUM(comments) AS comments
+    FROM
+        final AS f
+    LEFT JOIN
+        sharepoint_gold.pbi_db_dim_date AS d
+        ON d.date_key = f.visitdatekey
+    left join site_page_inventory AS w ON f.marketingPageId = w.marketingPageId
+    WHERE
+        YEAR(d.date) = YEAR(NOW())
+    GROUP BY
+        f.marketingPageId,
+        w.websitename,
+        f.employeebusinessdivision,
+        f.employeeregion
+),
+--div_ty: Counts unique visitors per business division for the current year.
+div_ty AS (
+    SELECT
+        f.employeebusinessdivision,
+        COUNT(DISTINCT f.viewingcontactid) AS uniquevisitor
+    FROM
+        final AS f
+    LEFT JOIN
+        sharepoint_gold.pbi_db_dim_date AS d
+        ON d.date_key = f.visitdatekey
+    WHERE
+        YEAR(d.date) = YEAR(NOW())
+    GROUP BY
+        f.employeebusinessdivision
+),
+--reg_ty: Counts unique visitors per region for the current year.
+reg_ty AS (
+    SELECT
+        f.employeeregion,
+        COUNT(DISTINCT f.viewingcontactid) AS uniquevisitor
+    FROM
+        final AS f
+    LEFT JOIN
+        sharepoint_gold.pbi_db_dim_date AS d
+        ON d.date_key = f.visitdatekey
+    WHERE
+        YEAR(d.date) = YEAR(NOW())
+    GROUP BY
+        f.employeeregion
+),
+
+site_ty AS (
+    SELECT
+        w.websitename,
+        COUNT(DISTINCT f.viewingcontactid) AS uniquevisitor
+    FROM
+        final AS f
+    LEFT JOIN
+        sharepoint_gold.pbi_db_dim_date AS d
+        ON d.date_key = f.visitdatekey
+    left join site_page_inventory AS w ON f.marketingPageId = w.marketingPageId
+    WHERE
+        YEAR(d.date) = YEAR(NOW())
+    GROUP BY
+        w.websitename
+
+),
+
+
+-- div_ty: Counts unique visitors per business division for the current year.
+site_div_ty AS (
+    SELECT
+        f.employeebusinessdivision, 
+        w.websitename,
+        COUNT(DISTINCT f.viewingcontactid) AS uniquevisitor
+    FROM
+        final AS f
+    LEFT JOIN
+        sharepoint_gold.pbi_db_dim_date AS d
+        ON d.date_key = f.visitdatekey
+    left join site_page_inventory AS w ON f.marketingPageId = w.marketingPageId
+    WHERE
+        YEAR(d.date) = YEAR(NOW())
+    GROUP BY
+        w.websitename,
+        f.employeebusinessdivision
+),
+--reg_ty: Counts unique visitors per region for the current year.
+site_reg_ty AS (
+    SELECT
+        f.employeeregion,
+        w.websitename,
+        COUNT(DISTINCT f.viewingcontactid) AS uniquevisitor
+    FROM
+        final AS f
+    LEFT JOIN
+        sharepoint_gold.pbi_db_dim_date AS d
+        ON d.date_key = f.visitdatekey
+    left join site_page_inventory AS w ON f.marketingPageId = w.marketingPageId
+    WHERE
+        YEAR(d.date) = YEAR(NOW())
+    GROUP BY
+        w.websitename,
+        f.employeeregion
+),
+site_div_reg_ty AS (
+    SELECT
+        f.employeebusinessdivision, f.employeeregion, w.websitename,
+        COUNT(DISTINCT f.viewingcontactid) AS uniquevisitor
+    FROM
+        final AS f
+    LEFT JOIN
+        sharepoint_gold.pbi_db_dim_date AS d
+        ON d.date_key = f.visitdatekey
+    left join site_page_inventory AS w ON f.marketingPageId = w.marketingPageId
+    WHERE
+        YEAR(d.date) = YEAR(NOW())
+    GROUP BY
+        w.websitename,
+        f.employeeregion,
+        f.employeebusinessdivision
+)
+
+
+
+--div_reg_28: Similar to div_reg, but only for the first 28 days from the earliest page interaction date.
+div_reg_28 AS (
+    SELECT
+        f.marketingPageId,
+        w.websitename,
+        f.employeebusinessdivision,
+        f.employeeregion,
+        COUNT(DISTINCT f.viewingcontactid) AS uniquevisitor,
+        COUNT(DISTINCT marketingPageIdliked) AS likes,
+        SUM(views) AS views,
+        SUM(visits) AS visits,
+        SUM(comments) AS comments
+    FROM
+        final AS f
+    LEFT JOIN
+        sharepoint_gold.pbi_db_dim_date AS d
+        ON d.date_key = f.visitdatekey
+    LEFT JOIN
+        minpagedate AS m
+        ON m.marketingPageId = f.marketingPageId
+    left join site_page_inventory AS w ON f.marketingPageId = w.marketingPageId
+    WHERE
+        d.date <= DATE_ADD(mindate, 27) and m.marketingPageId = f.marketingPageId
+    GROUP BY
+        f.marketingPageId, w.websitename,
+        f.employeebusinessdivision,
+        f.employeeregion
+),

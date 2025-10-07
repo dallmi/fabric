@@ -236,7 +236,7 @@ site_div_reg_ty AS (
         w.websitename,
         f.employeeregion,
         f.employeebusinessdivision
-)
+),
 
 
 

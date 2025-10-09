@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(sips:*)",
+      "Bash(cat:*)",
+      "Read(//Users/micha/Documents/**)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(gh auth:*)",
+      "Bash(git remote add:*)",
+      "Bash(git pull:*)",
+      "Bash(python3:*)",
+      "Bash(gh repo list:*)",
+      "Read(//Users/micha/**)",
+      "Bash(xargs:*)",
+      "Bash(mdfind:*)",
+      "Bash(git clone:*)",
+      "Bash(pandoc:*)",
+      "Bash(awk:*)",
+      "Bash(git log:*)",
+      "Bash(git mv:*)",
+      "Bash(git rm:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

@@ -915,7 +915,7 @@ SELECT
     k.likes as div_reg_likes21, -- total likes for the page, business division and region for the first 21 days from the earliest page interaction date
     k.uniquevisitor as div_reg_uniquevisitor21, -- Unique Visitor for the page, business division and region for the first 21 days from the earliest page interaction date
     l.uniquevisitor as div_uniquevisitor21, -- Unique Visitor for the business division for the first 21 days from the earliest page interaction date
-    m.uniquevisitor as reg_uniquevisitor21, -- Unique Visitor for the region for the first 21 days from the earliest page interaction date
+    n.uniquevisitor as reg_uniquevisitor21, -- Unique Visitor for the region for the first 21 days from the earliest page interaction date
     (
         SELECT
             COUNT(DISTINCT viewingcontactid) as uvall21

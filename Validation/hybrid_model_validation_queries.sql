@@ -10,6 +10,9 @@
 --   - Target 2 sites have ~5k pages combined
 --   - Need 13 months of data
 --   - Current full dataset: 60M rows over 2 years
+--
+-- IMPORTANT FIX: The investory table has multiple rows per marketingPageId (includes
+--                visitdatekey), so we must use DISTINCT to get unique page->website mapping
 -- =====================================================================================
 
 -- =====================================================================================
@@ -18,6 +21,14 @@
 -- Purpose: Identify which 2 sites to include for page-level detail
 -- Use: Business may want highest-volume sites or specific strategic sites
 
+WITH page_to_website AS (
+    -- Deduplicate investory table to get unique page->website mapping
+    SELECT DISTINCT
+        marketingPageId,
+        websitename
+    FROM
+        sharepoint_gold.pbi_db_website_page_investory
+)
 SELECT
     w.websitename,
     COUNT(*) AS total_interactions,
@@ -31,7 +42,7 @@ LEFT JOIN
     sharepoint_gold.pbi_db_dim_date AS d
     ON d.date_key = f.visitdatekey
 LEFT JOIN
-    sharepoint_gold.pbi_db_website_page_inventory AS w
+    page_to_website AS w
     ON f.marketingPageId = w.marketingPageId
 WHERE
     d.date >= DATE_ADD(CURRENT_DATE(), -395)  -- Last 13 months
@@ -48,6 +59,10 @@ LIMIT 20;
 -- Purpose: Estimate row count for page-level detail on 2 sites
 -- Action: Replace 'Site1' and 'Site2' with actual site names from Query 1
 
+WITH page_to_website AS (
+    SELECT DISTINCT marketingPageId, websitename
+    FROM sharepoint_gold.pbi_db_website_page_investory
+)
 SELECT
     '2 Sites - Page Level Detail' AS data_type,
     COUNT(*) AS row_count,
@@ -60,7 +75,7 @@ LEFT JOIN
     sharepoint_gold.pbi_db_dim_date AS d
     ON d.date_key = f.visitdatekey
 LEFT JOIN
-    sharepoint_gold.pbi_db_website_page_inventory AS w
+    page_to_website AS w
     ON f.marketingPageId = w.marketingPageId
 WHERE
     d.date >= DATE_ADD(CURRENT_DATE(), -395)  -- Last 13 months
@@ -73,7 +88,11 @@ WHERE
 -- Purpose: Estimate row count for aggregated data across all sites
 -- Note: Aggregated at website + division + region + date level (NO marketingPageId)
 
-WITH aggregated_data AS (
+WITH page_to_website AS (
+    SELECT DISTINCT marketingPageId, websitename
+    FROM sharepoint_gold.pbi_db_website_page_investory
+),
+aggregated_data AS (
     SELECT
         w.websitename,
         e.employeebusinessdivision,
@@ -97,7 +116,7 @@ WITH aggregated_data AS (
         sharepoint_gold.pbi_db_employeecontact AS e
         ON f.viewingcontactid = e.contactid
     LEFT JOIN
-        sharepoint_gold.pbi_db_website_page_inventory AS w
+        page_to_website AS w
         ON f.marketingPageId = w.marketingPageId
     WHERE
         d.date >= DATE_ADD(CURRENT_DATE(), -395)  -- Last 13 months
@@ -123,7 +142,11 @@ FROM aggregated_data;
 -- Purpose: Estimate total row count for hybrid approach
 -- Action: Replace 'Site1' and 'Site2' with actual site names
 
-WITH page_level_detail AS (
+WITH page_to_website AS (
+    SELECT DISTINCT marketingPageId, websitename
+    FROM sharepoint_gold.pbi_db_website_page_investory
+),
+page_level_detail AS (
     -- 2 Sites with full page-level detail
     SELECT
         f.viewingcontactid,
@@ -147,7 +170,7 @@ WITH page_level_detail AS (
         sharepoint_gold.pbi_db_employeecontact AS e
         ON f.viewingcontactid = e.contactid
     LEFT JOIN
-        sharepoint_gold.pbi_db_website_page_inventory AS w
+        page_to_website AS w
         ON f.marketingPageId = w.marketingPageId
     WHERE
         d.date >= DATE_ADD(CURRENT_DATE(), -395)  -- Last 13 months
@@ -177,7 +200,7 @@ all_sites_aggregated AS (
         sharepoint_gold.pbi_db_employeecontact AS e
         ON f.viewingcontactid = e.contactid
     LEFT JOIN
-        sharepoint_gold.pbi_db_website_page_inventory AS w
+        page_to_website AS w
         ON f.marketingPageId = w.marketingPageId
     WHERE
         d.date >= DATE_ADD(CURRENT_DATE(), -395)  -- Last 13 months
@@ -218,6 +241,10 @@ FROM (
 -- Purpose: Understand data volume patterns by month for capacity planning
 -- Note: Using aggregated approach (no page granularity)
 
+WITH page_to_website AS (
+    SELECT DISTINCT marketingPageId, websitename
+    FROM sharepoint_gold.pbi_db_website_page_investory
+)
 SELECT
     YEAR(d.date) AS year,
     MONTH(d.date) AS month,
@@ -242,7 +269,7 @@ LEFT JOIN
     sharepoint_gold.pbi_db_employeecontact AS e
     ON f.viewingcontactid = e.contactid
 LEFT JOIN
-    sharepoint_gold.pbi_db_website_page_inventory AS w
+    page_to_website AS w
     ON f.marketingPageId = w.marketingPageId
 WHERE
     d.date >= DATE_ADD(CURRENT_DATE(), -395)  -- Last 13 months
@@ -261,7 +288,11 @@ ORDER BY
 -- Purpose: If even aggregated contact-level is too large, consider daily aggregation
 -- Trade-off: Loses ability to calculate UV in Power BI, but drastically reduces rows
 
-WITH daily_aggregated AS (
+WITH page_to_website AS (
+    SELECT DISTINCT marketingPageId, websitename
+    FROM sharepoint_gold.pbi_db_website_page_investory
+),
+daily_aggregated AS (
     SELECT
         w.websitename,
         e.employeebusinessdivision,
@@ -281,7 +312,7 @@ WITH daily_aggregated AS (
         sharepoint_gold.pbi_db_employeecontact AS e
         ON f.viewingcontactid = e.contactid
     LEFT JOIN
-        sharepoint_gold.pbi_db_website_page_inventory AS w
+        page_to_website AS w
         ON f.marketingPageId = w.marketingPageId
     WHERE
         d.date >= DATE_ADD(CURRENT_DATE(), -395)  -- Last 13 months

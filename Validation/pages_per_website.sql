@@ -8,7 +8,7 @@ SELECT
     websitename,
     COUNT(DISTINCT marketingPageId) AS page_count
 FROM
-    sharepoint_gold.pbi_db_website_page_inventory
+    sharepoint_gold.pbi_db_website_page_investory
 GROUP BY
     websitename
 ORDER BY

@@ -54,7 +54,7 @@ site_page_inventory AS (
         marketingPageId,
         websitename
     FROM
-        sharepoint_gold.pbi_db_website_page_inventory
+        sharepoint_gold.pbi_db_website_page_investory
 ),
 
 final AS (

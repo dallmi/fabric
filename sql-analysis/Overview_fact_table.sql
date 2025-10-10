@@ -12,7 +12,7 @@ WITH minpagedate as (
         ON d.date_key = m.visitdatekey
     GROUP BY m.marketingPageId
 ),
-site_page_inventory as (select distinct marketingPageId,websitename from sharepoint_gold.pbi_db_website_page_inventory),
+site_page_inventory as (select distinct marketingPageId,websitename from sharepoint_gold.pbi_db_website_page_investory),
 final as (select f.*, case when e.employeebusinessdivision is null then 'Unknown' else e.employeebusinessdivision end as employeebusinessdivision,
         case when e.employeeregion is null then 'Unknown' else e.employeeregion end as employeeregion from sharepoint_gold.pbi_db_interactions_metrics F
 LEFT JOIN sharepoint_gold.pbi_db_employeecontact AS e on f.viewingcontactid = e.contactid),

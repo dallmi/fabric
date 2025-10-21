@@ -50,8 +50,11 @@ interactions_with_date AS (
         m.referrerapplicationid,
         m.views,
         m.visits,
-        m.comments,
+        m.comment,
         m.marketingPageIdliked,
+        m.flag,
+        m.durationsum,
+        m.durationavg,
         d.date AS visit_date,
         d.year AS visit_year,
         d.month AS visit_month,
@@ -134,13 +137,18 @@ SELECT
     COALESCE(i.views, 0) AS Views,                          -- Views count
     COALESCE(i.visits, 0) AS Visits,                        -- Visits count
 
-    -- Likes indicator (1 if liked, 0 if not)
+    -- Likes (based on marketingPageIdliked - if not null, user liked the page)
     CASE
         WHEN i.marketingPageIdliked IS NOT NULL THEN 1
         ELSE 0
-    END AS Likes,                                           -- Like indicator
+    END AS Likes,                                           -- Like indicator (1 = liked, 0 = not liked)
 
-    COALESCE(i.comments, 0) AS Comments                     -- Comments count
+    COALESCE(i.comment, 0) AS Comments,                     -- Comments count
+
+    -- Additional metrics from interactions_metrics
+    COALESCE(i.durationsum, 0) AS Duration_Sum,             -- Total duration
+    COALESCE(i.durationavg, 0) AS Duration_Avg,             -- Average duration
+    COALESCE(i.flag, 0) AS Flag                             -- Flag field
 
 FROM
     interactions_with_date AS i
@@ -191,12 +199,13 @@ ORDER BY
 -- - Analyze contact-level patterns and behavior
 -- - Filter by Referrer_application to see traffic sources
 --
--- Output Fields (exact match to requirements):
+-- Output Fields:
 -- - Year, Quarter_name, Month, Week_of_Year, Date
 -- - Employee_business_division, Employee_class, OU_LVL_1-5, Employee_rank
 -- - Employee_region, Employee_work_country
 -- - Referrer_application, Site_name, URL
 -- - Unique_Visitors (contact ID), Views, Visits, Likes, Comments
+-- - Duration_Sum, Duration_Avg, Flag (additional metrics)
 --
 -- Data Quality Checks:
 -- - Monitor 'Unknown' values in employee dimensions

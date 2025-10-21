@@ -81,6 +81,8 @@
 
 **Key Metrics:**
 - Views, Visits, Likes, Comments (raw, per interaction)
+- Duration_Sum, Duration_Avg (interaction duration metrics)
+- Flag (interaction flag)
 - Contact_ID (for UV calculation)
 
 **Usage:**
@@ -247,6 +249,21 @@ Total Likes = SUM('fact_90days_contact'[Likes])
 Total Comments = SUM('fact_90days_contact'[Comments])
 
 // ============================================================================
+// Duration Metrics
+// ============================================================================
+Total Duration = SUM('fact_90days_contact'[Duration_Sum])
+
+Average Duration per Interaction =
+    DIVIDE(
+        SUM('fact_90days_contact'[Duration_Sum]),
+        COUNTROWS('fact_90days_contact'),
+        0
+    )
+
+// Or use pre-calculated average
+Avg Duration = AVERAGE('fact_90days_contact'[Duration_Avg])
+
+// ============================================================================
 // Calculated Metrics
 // ============================================================================
 Views per Visitor =
@@ -261,6 +278,12 @@ Engagement Rate =
 
 Average Views per Visit =
     DIVIDE([Total Views], [Total Visits], 0)
+
+Average Duration per Visit =
+    DIVIDE([Total Duration], [Total Visits], 0)
+
+Average Duration per Visitor =
+    DIVIDE([Total Duration], [Unique Visitors], 0)
 
 // ============================================================================
 // Time Intelligence (using dim_date)
@@ -568,6 +591,28 @@ ANALYZE TABLE sharepoint_gold.dim_website_page COMPUTE STATISTICS;
 - Review usage analytics
 - Optimize underperforming visuals
 - Update documentation
+
+---
+
+## Field Mapping from Source Tables
+
+### interactions_metrics Table Fields:
+- `visitdatekey` → Date key for joining to dim_date
+- `referrerapplicationid` → FK to dim_referrer
+- `marketingPageId` → FK to dim_website_page
+- `viewingcontactid` → Contact ID (used for UV calculation)
+- `views` → Number of views
+- `visits` → Number of visits
+- `comment` → Number of comments (singular, not "comments")
+- `marketingPageIdliked` → If not NULL, user liked the page
+- `durationsum` → Total duration of interaction
+- `durationavg` → Average duration of interaction
+- `flag` → Interaction flag
+
+**Important Notes:**
+- `comment` is singular in the source table
+- UV is calculated as `COUNT(DISTINCT viewingcontactid)`
+- Likes are derived from `marketingPageIdliked IS NOT NULL`
 
 ---
 

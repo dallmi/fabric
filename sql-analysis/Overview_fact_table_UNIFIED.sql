@@ -51,8 +51,11 @@ WITH recent_detail AS (
         -- Metrics
         m.views,
         m.visits,
-        m.comments,
+        m.comment,
         CASE WHEN m.marketingPageIdliked IS NOT NULL THEN 1 ELSE 0 END AS likes,
+        m.durationsum,
+        m.durationavg,
+        m.flag,
 
         -- Flag to identify data source
         'RECENT_DETAIL' AS data_source
@@ -102,8 +105,11 @@ historical_aggregated AS (
         -- Metrics (already aggregated)
         f.div_reg_views AS views,
         f.div_reg_visits AS visits,
-        f.div_reg_comments AS comments,
+        f.div_reg_comments AS comment,
         f.div_reg_likes AS likes,
+        NULL AS durationsum,  -- Not available in aggregated table
+        NULL AS durationavg,  -- Not available in aggregated table
+        NULL AS flag,         -- Not available in aggregated table
 
         -- Flag to identify data source
         'HISTORICAL_AGG' AS data_source
@@ -147,7 +153,10 @@ SELECT
     COALESCE(views, 0) AS Views,
     COALESCE(visits, 0) AS Visits,
     COALESCE(likes, 0) AS Likes,
-    COALESCE(comments, 0) AS Comments,
+    COALESCE(comment, 0) AS Comments,
+    COALESCE(durationsum, 0) AS Duration_Sum,
+    COALESCE(durationavg, 0) AS Duration_Avg,
+    COALESCE(flag, 0) AS Flag,
 
     -- ===========================================================================
     -- METADATA
@@ -177,7 +186,10 @@ SELECT
     COALESCE(views, 0) AS Views,
     COALESCE(visits, 0) AS Visits,
     COALESCE(likes, 0) AS Likes,
-    COALESCE(comments, 0) AS Comments,
+    COALESCE(comment, 0) AS Comments,
+    COALESCE(durationsum, 0) AS Duration_Sum,
+    COALESCE(durationavg, 0) AS Duration_Avg,
+    COALESCE(flag, 0) AS Flag,
     data_source AS Data_Source,
     CASE
         WHEN viewingcontactid IS NOT NULL THEN TRUE

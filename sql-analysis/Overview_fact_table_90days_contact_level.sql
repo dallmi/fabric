@@ -50,7 +50,7 @@ interactions_with_date AS (
         m.referrerapplicationid,
         m.views,
         m.visits,
-        m.comment,
+        m.comments,
         m.marketingPageIdliked,
         m.flag,
         m.durationsum,
@@ -143,7 +143,7 @@ SELECT
         ELSE 0
     END AS Likes,                                           -- Like indicator (1 = liked, 0 = not liked)
 
-    COALESCE(i.comment, 0) AS Comments,                     -- Comments count
+    COALESCE(i.comments, 0) AS Comments,                    -- Comments count
 
     -- Additional metrics from interactions_metrics
     COALESCE(i.durationsum, 0) AS Duration_Sum,             -- Total duration

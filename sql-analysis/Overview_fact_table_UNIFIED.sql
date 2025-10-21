@@ -51,7 +51,7 @@ WITH recent_detail AS (
         -- Metrics
         m.views,
         m.visits,
-        m.comment,
+        m.comments,
         CASE WHEN m.marketingPageIdliked IS NOT NULL THEN 1 ELSE 0 END AS likes,
         m.durationsum,
         m.durationavg,
@@ -105,7 +105,7 @@ historical_aggregated AS (
         -- Metrics (already aggregated)
         f.div_reg_views AS views,
         f.div_reg_visits AS visits,
-        f.div_reg_comments AS comment,
+        f.div_reg_comments AS comments,
         f.div_reg_likes AS likes,
         NULL AS durationsum,  -- Not available in aggregated table
         NULL AS durationavg,  -- Not available in aggregated table
@@ -153,7 +153,7 @@ SELECT
     COALESCE(views, 0) AS Views,
     COALESCE(visits, 0) AS Visits,
     COALESCE(likes, 0) AS Likes,
-    COALESCE(comment, 0) AS Comments,
+    COALESCE(comments, 0) AS Comments,
     COALESCE(durationsum, 0) AS Duration_Sum,
     COALESCE(durationavg, 0) AS Duration_Avg,
     COALESCE(flag, 0) AS Flag,
@@ -186,7 +186,7 @@ SELECT
     COALESCE(views, 0) AS Views,
     COALESCE(visits, 0) AS Visits,
     COALESCE(likes, 0) AS Likes,
-    COALESCE(comment, 0) AS Comments,
+    COALESCE(comments, 0) AS Comments,
     COALESCE(durationsum, 0) AS Duration_Sum,
     COALESCE(durationavg, 0) AS Duration_Avg,
     COALESCE(flag, 0) AS Flag,

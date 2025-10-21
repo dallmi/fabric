@@ -603,14 +603,13 @@ ANALYZE TABLE sharepoint_gold.dim_website_page COMPUTE STATISTICS;
 - `viewingcontactid` → Contact ID (used for UV calculation)
 - `views` → Number of views
 - `visits` → Number of visits
-- `comment` → Number of comments (singular, not "comments")
+- `comments` → Number of comments
 - `marketingPageIdliked` → If not NULL, user liked the page
 - `durationsum` → Total duration of interaction
 - `durationavg` → Average duration of interaction
 - `flag` → Interaction flag
 
 **Important Notes:**
-- `comment` is singular in the source table
 - UV is calculated as `COUNT(DISTINCT viewingcontactid)`
 - Likes are derived from `marketingPageIdliked IS NOT NULL`
 
